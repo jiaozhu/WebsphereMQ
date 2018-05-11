@@ -11,11 +11,13 @@ import org.junit.Test;
 public class TestWebSphereMQ {
     @Test
     public void testSendMessage() {
-        System.out.println(WebSphereMQ.sendMessage("TestWebSphereMQ hello word!"));
+        WebSphereMQ webSphereMQ = WebSphereMQ.getInstance("10.10.10.201",1414,"WMQ1","CNN_IDEA","a_remote");
+        System.out.println(webSphereMQ.sendMessage("Hello World"));
     }
 
     @Test
     public void testGetMessage() {
-        System.out.println(WebSphereMQ.getMessage());
+        WebSphereMQ webSphereMQ = WebSphereMQ.getInstance("10.10.10.202",1414,"WMQ2","CNN_IDEA","b_local");
+        System.out.println(webSphereMQ.getMessage());
     }
 }

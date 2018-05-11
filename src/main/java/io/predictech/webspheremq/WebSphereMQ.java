@@ -11,35 +11,46 @@ import java.io.IOException;
  * @description
  */
 public class WebSphereMQ {
-    // 定义队列管理器和队列的名称
-    private static String hostname = "10.10.10.100"; // MQ服务器的IP地址
-    private static int port = 1414; // MQ端口
+
     private static int ccsid = 1208; // 服务器MQ服务使用的编码1381代表GBK、1208代表UTF
-    private static String qmName = "QM_JACK"; // MQ的队列管理器名称;
-    private static String channel = "CNN_JACK"; // 服务器连接的通道
-    private static String qName = "QUEUE_RECV"; // MQ远程队列的名称;
     private static MQQueueManager qMgr;
+    private static String qmName;
+    private static String qName;
 
 
-    static {
-        MQEnvironment.hostname = hostname;
-        MQEnvironment.channel = channel;
-        MQEnvironment.CCSID = ccsid;
-        MQEnvironment.port = port;
-        MQEnvironment.userID = "mqm";
-        MQEnvironment.password = "mqm";
-        try {
-            // 定义并初始化队列管理器对象并连接
-            qMgr = new MQQueueManager(qmName);
-        } catch (MQException e) {
-            System.out.println("初使化MQ出错");
-            e.printStackTrace();
-        }
+    private WebSphereMQ() {
     }
 
+    private static WebSphereMQ instance = null;
+
+    public static WebSphereMQ getInstance(String hostname,int port,String qmName,String channel,String qName){
+        if(instance == null){
+            instance = new WebSphereMQ();
+
+            MQEnvironment.hostname = hostname;
+            MQEnvironment.channel = channel;
+            MQEnvironment.CCSID = ccsid;
+            MQEnvironment.port = port;
+            MQEnvironment.userID = "mqadmin";
+            MQEnvironment.password = "mqadmin";
+
+            WebSphereMQ.qmName = qmName;
+            WebSphereMQ.qName = qName;
+
+            try {
+                // 定义并初始化队列管理器对象并连接
+                qMgr = new MQQueueManager(qmName);
+            } catch (MQException e) {
+                System.out.println("初使化MQ出错");
+                e.printStackTrace();
+            }
+
+        }
+        return instance;
+    }
 
     // 往MQ发送消息
-    public static String sendMessage(String message) {
+    public  String sendMessage(String message) {
         try {
             // 设置将要连接的队列属性
             int openOptions = MQC.MQOO_OUTPUT | MQC.MQOO_FAIL_IF_QUIESCING;
@@ -74,7 +85,7 @@ public class WebSphereMQ {
     }
 
     // 从队列中去获取消息，如果队列中没有消息，就会发生异常
-    public static String getMessage() {
+    public  String getMessage() {
         String message = null;
         try {
             // 设置将要连接的队列属性
